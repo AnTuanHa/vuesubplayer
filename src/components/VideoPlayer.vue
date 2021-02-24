@@ -15,6 +15,7 @@
 
 <script lang="ts">
 import { defineComponent, inject } from "vue";
+import Store from "@/interfaces/Store";
 
 export default defineComponent({
   name: "VideoPlayer",
@@ -31,7 +32,7 @@ export default defineComponent({
   },
 
   setup() {
-    const global: any = inject("global");
+    const store = inject("Store") as Store;
 
     return {
       onCueChange: (e: Event) => {
@@ -41,7 +42,7 @@ export default defineComponent({
         if (!element.track.activeCues || !element.track.activeCues[0]) {
           return;
         }
-        global.updateCurrentText((element.track.activeCues[0] as VTTCue).text);
+        store.updateCurrentText((element.track.activeCues[0] as VTTCue).text);
       },
 
       onCaptionsLoad: (e: Event) => {
@@ -51,7 +52,7 @@ export default defineComponent({
         if (!element.track.cues) {
           return;
         }
-        global.updateCues([...element.track.cues]);
+        store.updateCues([...element.track.cues]);
       }
     };
   }

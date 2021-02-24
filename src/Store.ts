@@ -1,9 +1,5 @@
 import { reactive, readonly } from "vue";
-
-interface State {
-  cues: TextTrackCue[];
-  currentText: string;
-}
+import State from "./interfaces/State";
 
 const state: State = reactive({
   cues: [],

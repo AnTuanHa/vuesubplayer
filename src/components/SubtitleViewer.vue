@@ -1,18 +1,19 @@
 <template>
   <div class="subtitle-viewer">
-    {{ global.state.currentText }}
+    {{ store.state.currentText }}
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, inject } from "vue";
+import Store from "@/interfaces/Store";
 
 export default defineComponent({
   name: "SubtitleViewer",
   setup() {
-    const global: any = inject("global");
+    const store: Store = inject("Store") as Store;
     return {
-      global
+      store
     };
   }
 });

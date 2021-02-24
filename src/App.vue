@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { defineComponent, provide, ref } from "vue";
-import global from "./global";
+import Store from "./Store";
 import SubtitleParser from "./utils/subtitle-parser";
 
 import SubtitleViewer from "./components/SubtitleViewer.vue";
@@ -28,7 +28,7 @@ export default defineComponent({
   },
 
   setup() {
-    provide("global", global);
+    provide("Store", Store);
 
     const subtitlesUrl = ref("");
     const videoUrl = ref("");
