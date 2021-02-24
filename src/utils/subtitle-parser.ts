@@ -1,10 +1,4 @@
-interface Caption {
-  id: string;
-  startTime: number;
-  endTime: number;
-  text: string;
-  voice: string;
-}
+import Caption from "@/interfaces/Caption";
 
 const convertAssToCaptions = (text: string) => {
   /* Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -46,23 +40,19 @@ const convertAssToCaptions = (text: string) => {
   };
 
   const lines = text.split(/[\n\r]+/g);
-  const captions = lines
-    .map((line, index) => {
-      const match = line.match(reAss);
-      if (!match) {
-        return null;
-      }
-      return {
+  const captions: Caption[] = [];
+  lines.forEach((line, index) => {
+    const match = line.match(reAss);
+    if (match) {
+      captions.push({
         id: `${index + 1}`,
         startTime: getSeconds(match[1]),
         endTime: getSeconds(match[2]),
         text: match[5].replace(reStyle, "").replace(/\\N/g, "\n"),
         voice: match[3] && match[4] ? match[3] + " " + match[4] : ""
-      };
-    })
-    .filter(caption => {
-      return caption != null;
-    });
+      });
+    }
+  });
 
   return captions.length ? captions : null;
 };
@@ -91,26 +81,25 @@ const convertSrtToCaptions = (text: string) => {
     );
   };
 
+  const captions: Caption[] = [];
   const entries = text.split(/\n[\r\n]+/g);
-  const captions = entries
-    .map(entry => {
-      const lines = entry.split(/\n+/g);
-      /* Proper SRT files have entries that look like:
-       * 1
-       * 00:00:12,137 --> 00:00:13,680
-       * My first line
-       *
-       * 2
-       * 00:00:14,597 --> 00:00:16,933
-       * My second line
-       *
-       * That is, each caption should have 3 lines
-       */
-      if (lines.length < 3) {
-        return null;
-      }
+  entries.forEach(entry => {
+    const lines = entry.split(/\n+/g);
+    /* Proper SRT files have entries that look like:
+     * 1
+     * 00:00:12,137 --> 00:00:13,680
+     * My first line
+     *
+     * 2
+     * 00:00:14,597 --> 00:00:16,933
+     * My second line
+     * My third line
+     *
+     * That is, each caption should have 3 or more lines
+     */
+    if (lines.length >= 3) {
       const timestamps = lines[1].split(/\s*-->\s*/);
-      return {
+      captions.push({
         id: lines[0],
         startTime: getSeconds(timestamps[0]),
         endTime: getSeconds(timestamps[1]),
@@ -119,17 +108,15 @@ const convertSrtToCaptions = (text: string) => {
           .join("\n")
           .replace(/\{\\an[0-9]{1,2}\}/g, ""),
         voice: ""
-      };
-    })
-    .filter(caption => {
-      return caption != null;
-    });
+      });
+    }
+  });
 
   return captions.length ? captions : null;
 };
 
 // For the format of WEBVTT, see: https://developer.mozilla.org/en-US/docs/Web/API/WebVTT_API
-const formatVtt = (captions: any) => {
+const formatVtt = (captions: Caption[]) => {
   if (!captions) {
     return null;
   }
