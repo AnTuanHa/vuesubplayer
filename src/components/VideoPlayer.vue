@@ -1,14 +1,20 @@
 <template>
   <div class="video-player">
     <video class="video-element" :src="videoUrl" crossorigin controls>
-      <track kind="subtitles" :src="subtitlesUrl" default />
+      <track
+        kind="subtitles"
+        :src="subtitlesUrl"
+        default
+        @cuechange="onCueChange"
+        @load="onCaptionsLoad"
+      />
       Your browser does not support the video tag
     </video>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, inject } from "vue";
 
 export default defineComponent({
   name: "VideoPlayer",
@@ -22,6 +28,32 @@ export default defineComponent({
       type: String,
       default: ""
     }
+  },
+
+  setup() {
+    const global: any = inject("global");
+
+    return {
+      onCueChange: (e: Event) => {
+        // Hide the built-in captions
+        const element = e.target as HTMLTrackElement;
+        element.track.mode = "hidden";
+        if (!element.track.activeCues || !element.track.activeCues[0]) {
+          return;
+        }
+        global.updateCurrentText((element.track.activeCues[0] as VTTCue).text);
+      },
+
+      onCaptionsLoad: (e: Event) => {
+        // Hide the built-in captions
+        const element = e.target as HTMLTrackElement;
+        element.track.mode = "hidden";
+        if (!element.track.cues) {
+          return;
+        }
+        global.updateCues([...element.track.cues]);
+      }
+    };
   }
 });
 </script>

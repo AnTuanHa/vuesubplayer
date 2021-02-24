@@ -2,13 +2,17 @@
   <div id="app" @drop.prevent.stop="onDropEvent" @dragover.prevent.stop>
     <main class="app-main">
       <VideoPlayer :video-url="videoUrl" :subtitles-url="subtitlesUrl" />
+      <SubtitleViewer />
     </main>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, provide, ref } from "vue";
+import global from "./global";
+import SubtitleParser from "./utils/subtitle-parser";
 
+import SubtitleViewer from "./components/SubtitleViewer.vue";
 import VideoPlayer from "./components/VideoPlayer.vue";
 
 const isSubtitleFile = function(file: File) {
@@ -19,15 +23,28 @@ export default defineComponent({
   name: "App",
 
   components: {
+    SubtitleViewer,
     VideoPlayer
   },
 
   setup() {
+    provide("global", global);
+
     const subtitlesUrl = ref("");
     const videoUrl = ref("");
 
     const loadSubtitleFile = (file: File) => {
-      // todo: add load subtitles
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = () => {
+        const vtt = SubtitleParser.toVtt(reader.result as string);
+        if (!vtt) {
+          return;
+        }
+        subtitlesUrl.value = `data:text/vtt;charset=utf-8,${encodeURIComponent(
+          vtt
+        )}`;
+      };
       return;
     };
 
