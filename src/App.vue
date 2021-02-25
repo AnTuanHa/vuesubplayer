@@ -4,6 +4,9 @@
       <VideoPlayer :video-url="videoUrl" :subtitles-url="subtitlesUrl" />
       <SubtitleViewer />
     </main>
+    <aside class="app-aside">
+      <SubtitleTracklistViewer />
+    </aside>
   </div>
 </template>
 
@@ -13,6 +16,7 @@ import Store from "./Store";
 import SubtitleParser from "./utils/subtitle-parser";
 
 import SubtitleViewer from "./components/SubtitleViewer.vue";
+import SubtitleTracklistViewer from "./components/SubtitleTracklistViewer.vue";
 import VideoPlayer from "./components/VideoPlayer.vue";
 
 const isSubtitleFile = function(file: File) {
@@ -24,6 +28,7 @@ export default defineComponent({
 
   components: {
     SubtitleViewer,
+    SubtitleTracklistViewer,
     VideoPlayer
   },
 
@@ -93,6 +98,13 @@ body {
 
 .app-main {
   flex: 1 80vw;
+  position: relative;
+}
+
+.app-aside {
+  flex: 1 0.001%;
+  height: 100vh;
+  overflow: hidden;
   position: relative;
 }
 </style>

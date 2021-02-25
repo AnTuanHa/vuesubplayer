@@ -1,6 +1,12 @@
 <template>
   <div class="video-player">
-    <video class="video-element" :src="videoUrl" crossorigin controls>
+    <video
+      ref="videoElement"
+      class="video-element"
+      :src="videoUrl"
+      crossorigin
+      controls
+    >
       <track
         kind="subtitles"
         :src="subtitlesUrl"
@@ -14,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject } from "vue";
+import { defineComponent, inject, ref, watch } from "vue";
 import Store from "@/interfaces/Store";
 
 export default defineComponent({
@@ -33,8 +39,22 @@ export default defineComponent({
 
   setup() {
     const store = inject("Store") as Store;
+    const videoElement = ref<HTMLVideoElement>();
+
+    watch(
+      () => store.state.currentTime,
+      (newTime, oldTime) => {
+        if (!videoElement.value) {
+          return;
+        }
+        videoElement.value.currentTime = newTime;
+        videoElement.value.play();
+      }
+    );
 
     return {
+      videoElement,
+
       onCueChange: (e: Event) => {
         // Hide the built-in captions
         const element = e.target as HTMLTrackElement;
@@ -42,7 +62,7 @@ export default defineComponent({
         if (!element.track.activeCues || !element.track.activeCues[0]) {
           return;
         }
-        store.updateCurrentText((element.track.activeCues[0] as VTTCue).text);
+        store.updateCurrentCue(element.track.activeCues[0] as VTTCue);
       },
 
       onCaptionsLoad: (e: Event) => {
@@ -52,7 +72,8 @@ export default defineComponent({
         if (!element.track.cues) {
           return;
         }
-        store.updateCues([...element.track.cues]);
+        const trackCues = [...element.track.cues];
+        store.updateCues(trackCues as VTTCue[]);
       }
     };
   }

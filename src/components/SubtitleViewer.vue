@@ -1,6 +1,6 @@
 <template>
   <div class="subtitle-viewer">
-    {{ store.state.currentText }}
+    {{ store.state.currentCue.text }}
   </div>
 </template>
 

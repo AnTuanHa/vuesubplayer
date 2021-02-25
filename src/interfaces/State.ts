@@ -1,4 +1,5 @@
 export default interface State {
-  cues: TextTrackCue[];
-  currentText: string;
+  cues: VTTCue[];
+  currentCue: VTTCue;
+  currentTime: number;
 }
