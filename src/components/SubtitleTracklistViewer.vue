@@ -19,12 +19,15 @@
 
 <script lang="ts">
 import { ref, defineComponent, inject, watch, onBeforeUpdate } from "vue";
-import Store from "@/interfaces/Store";
+import { StoreKey } from "@/symbols";
 
 export default defineComponent({
   name: "SubtitleTracklistViewer",
   setup() {
-    const store = inject("Store") as Store;
+    const store = inject(StoreKey);
+    if (!store) {
+      throw new Error(`Could not resolve ${StoreKey.description}`);
+    }
     const divElements = ref([]);
 
     // make sure to reset the refs before each update

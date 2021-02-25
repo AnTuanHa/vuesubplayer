@@ -12,6 +12,7 @@
 
 <script lang="ts">
 import { defineComponent, provide, ref } from "vue";
+import { StoreKey } from "./symbols";
 import Store from "./Store";
 import SubtitleParser from "./utils/subtitle-parser";
 
@@ -33,7 +34,7 @@ export default defineComponent({
   },
 
   setup() {
-    provide("Store", Store);
+    provide(StoreKey, Store);
 
     const subtitlesUrl = ref("");
     const videoUrl = ref("");

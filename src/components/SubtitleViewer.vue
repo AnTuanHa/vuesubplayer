@@ -6,12 +6,15 @@
 
 <script lang="ts">
 import { defineComponent, inject } from "vue";
-import Store from "@/interfaces/Store";
+import { StoreKey } from "@/symbols";
 
 export default defineComponent({
   name: "SubtitleViewer",
   setup() {
-    const store: Store = inject("Store") as Store;
+    const store = inject(StoreKey);
+    if (!store) {
+      throw new Error(`Could not resolve ${StoreKey.description}`);
+    }
     return {
       store
     };
