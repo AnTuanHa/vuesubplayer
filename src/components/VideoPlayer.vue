@@ -43,7 +43,7 @@ export default defineComponent({
 
     watch(
       () => store.state.currentTime,
-      (newTime, oldTime) => {
+      newTime => {
         if (!videoElement.value) {
           return;
         }
