@@ -49,7 +49,7 @@ export default defineComponent({
       store,
       divElements,
       onClick: function(cue: VTTCue) {
-        store.updateCurrentTime(cue.startTime);
+        store.updateCurrentTime(cue.startTime + 0.0001);
       },
       isActive: function(cue: VTTCue): boolean {
         return store.state.currentCue.id === cue.id;
