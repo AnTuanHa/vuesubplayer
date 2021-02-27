@@ -4,8 +4,11 @@
       ref="videoElement"
       class="video-element"
       :src="videoUrl"
-      crossorigin
+      crossorigin="anonymous"
       controls
+      disablePictureInPicture
+      disabled
+      tabIndex="-1"
     >
       <track
         kind="subtitles"
