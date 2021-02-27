@@ -29,14 +29,17 @@ export default defineComponent({
   text-align: center;
   color: #ffffff;
   position: absolute;
-  width: fit-content;
+  width: max-content;
+  max-width: 82%;
   bottom: 10%;
   left: 50%;
-  -webkit-transform: translateX(-50%);
-  transform: translateX(-50%);
+  -webkit-transform: translate(-50%, 0%);
+  transform: translate(-50%, 0%);
   z-index: 2;
   background-color: rgba(0, 0, 0, 0.7);
-  white-space: pre;
-  padding: 8px;
+  padding: 5px 25px;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
 }
 </style>
