@@ -1,5 +1,7 @@
+import TimeEvent from "./TimeEvent";
+
 export default interface State {
   cues: VTTCue[];
   currentCue: VTTCue;
-  currentTime: number;
+  currentTimeEvent: TimeEvent;
 }

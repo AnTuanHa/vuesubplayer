@@ -20,6 +20,7 @@
 <script lang="ts">
 import { ref, defineComponent, inject, watch, onBeforeUpdate } from "vue";
 import { StoreKey } from "@/symbols";
+import { Origin } from "@/interfaces/TimeEvent";
 
 export default defineComponent({
   name: "SubtitleTracklistViewer",
@@ -49,7 +50,12 @@ export default defineComponent({
       store,
       divElements,
       onClick: function(cue: VTTCue) {
-        store.updateCurrentTime(cue.startTime + 0.0001);
+        // Add a small delta so that the tracklist selects the correct caption
+        // if the user clicks on a subtitle that is timed too close to another one
+        store.updateCurrentTimeEvent(
+          cue.startTime + 0.0001,
+          Origin.SubtitleTracklistViewer
+        );
       },
       isActive: function(cue: VTTCue): boolean {
         return store.state.currentCue.id === cue.id;

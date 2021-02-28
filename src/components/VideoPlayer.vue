@@ -9,6 +9,7 @@
       disablePictureInPicture
       disabled
       tabIndex="-1"
+      @timeupdate="onTimeUpdate"
     >
       <track
         kind="subtitles"
@@ -25,6 +26,7 @@
 <script lang="ts">
 import { defineComponent, inject, ref, watch } from "vue";
 import { StoreKey } from "@/symbols";
+import { Origin } from "@/interfaces/TimeEvent";
 
 export default defineComponent({
   name: "VideoPlayer",
@@ -48,13 +50,15 @@ export default defineComponent({
     const videoElement = ref<HTMLVideoElement>();
 
     watch(
-      () => store.state.currentTime,
-      newTime => {
+      () => store.state.currentTimeEvent,
+      newTimeEvent => {
         if (!videoElement.value) {
           return;
         }
-        videoElement.value.currentTime = newTime;
-        videoElement.value.play();
+        if (newTimeEvent.origin === Origin.SubtitleTracklistViewer) {
+          videoElement.value.currentTime = newTimeEvent.time;
+          videoElement.value.play();
+        }
       }
     );
 
@@ -80,6 +84,16 @@ export default defineComponent({
         }
         const trackCues = [...element.track.cues];
         store.updateCues(trackCues as VTTCue[]);
+      },
+
+      onTimeUpdate: () => {
+        if (!videoElement.value) {
+          return;
+        }
+        store.updateCurrentTimeEvent(
+          videoElement.value.currentTime,
+          Origin.VideoPlayer
+        );
       }
     };
   }
