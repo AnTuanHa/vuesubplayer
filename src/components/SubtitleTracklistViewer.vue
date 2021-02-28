@@ -39,9 +39,11 @@ export default defineComponent({
     watch(
       () => store.state.currentCue,
       newCue => {
-        const el = (divElements.value as HTMLDivElement[])[
-          Number(newCue.id) - 1
-        ];
+        const index = store.state.cues.findIndex(cue => cue.id === newCue.id);
+        if (index === -1) {
+          return;
+        }
+        const el = (divElements.value as HTMLDivElement[])[index];
         el.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     );
