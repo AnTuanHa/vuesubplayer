@@ -27,6 +27,14 @@
     <div v-show="subtitlesUrl" class="app-aside">
       <SubtitleTracklistViewer />
     </div>
+    <div v-show="subtitlesUrl" class="controls">
+      <div
+        class="edit-subtitles-button unselectable"
+        @click="onClickEditSubtitlesButton"
+      >
+        {{ isInEditMode ? "Cancel" : "Edit Subtitles" }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -59,6 +67,7 @@ export default defineComponent({
     const subtitlesUrl = ref("");
     const videoUrl = ref("");
     const loadVideoError = ref("");
+    const isInEditMode = ref(false);
 
     const loadSubtitleFile = (file: File) => {
       const reader = new FileReader();
@@ -87,6 +96,7 @@ export default defineComponent({
       subtitlesUrl,
       videoUrl,
       loadVideoError,
+      isInEditMode,
       onDropEvent: (e: DragEvent) => {
         if (!e.dataTransfer) {
           return;
@@ -97,6 +107,9 @@ export default defineComponent({
       },
       onVideoError: (message: string) => {
         loadVideoError.value = message;
+      },
+      onClickEditSubtitlesButton: () => {
+        isInEditMode.value = isInEditMode.value ? false : true;
       }
     };
   }
@@ -122,9 +135,9 @@ body {
     "video video subtitles"
     "video video subtitles"
     "video video subtitles"
-    "video video subtitles";
-  grid-template-rows: auto auto auto;
-  grid-template-columns: auto auto 13vw;
+    "video video controls";
+  grid-template-rows: 95.4% 1% 0% 3.6%;
+  grid-template-columns: 87% 0 13%;
   position: relative;
   background-color: black;
 }
@@ -136,9 +149,13 @@ body {
 
 .app-aside {
   grid-area: subtitles;
-  height: 100vh;
-  overflow: hidden;
   position: relative;
+}
+
+.controls {
+  grid-area: controls;
+  width: 100%;
+  height: 100%;
 }
 
 .video-subtitles-missing {
@@ -167,5 +184,30 @@ body {
   width: 90%;
   max-width: 600px;
   text-align: center;
+}
+
+.edit-subtitles-button {
+  padding: 0.2rem;
+  font-size: 1.5vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  background-color: black;
+  color: #444444;
+  height: 100%;
+}
+
+.edit-subtitles-button:hover {
+  background-color: #102027;
+  color: white;
+}
+
+.unselectable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 </style>
