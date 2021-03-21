@@ -30,9 +30,9 @@
     <div v-show="subtitlesUrl" class="controls">
       <div
         class="edit-subtitles-button unselectable"
-        @click="onClickEditSubtitlesButton"
+        @click="Store.toggleEditMode()"
       >
-        {{ isInEditMode ? "Cancel" : "Edit Subtitles" }}
+        {{ Store.state.isInEditMode ? "Cancel" : "Edit Subtitles" }}
       </div>
     </div>
   </div>
@@ -67,7 +67,6 @@ export default defineComponent({
     const subtitlesUrl = ref("");
     const videoUrl = ref("");
     const loadVideoError = ref("");
-    const isInEditMode = ref(false);
 
     const loadSubtitleFile = (file: File) => {
       const reader = new FileReader();
@@ -93,10 +92,10 @@ export default defineComponent({
     };
 
     return {
+      Store,
       subtitlesUrl,
       videoUrl,
       loadVideoError,
-      isInEditMode,
       onDropEvent: (e: DragEvent) => {
         if (!e.dataTransfer) {
           return;
@@ -107,9 +106,6 @@ export default defineComponent({
       },
       onVideoError: (message: string) => {
         loadVideoError.value = message;
-      },
-      onClickEditSubtitlesButton: () => {
-        isInEditMode.value = isInEditMode.value ? false : true;
       }
     };
   }

@@ -6,7 +6,8 @@ import TimeEvent from "./interfaces/TimeEvent";
 const state: State = reactive({
   cues: [],
   currentCue: {} as VTTCue,
-  currentTimeEvent: {} as TimeEvent
+  currentTimeEvent: {} as TimeEvent,
+  isInEditMode: false
 });
 
 const updateCues = function(cues: VTTCue[]) {
@@ -24,9 +25,14 @@ const updateCurrentTimeEvent = function(time: number, origin: Origin) {
   };
 };
 
+const toggleEditMode = function() {
+  state.isInEditMode = state.isInEditMode ? false : true;
+};
+
 export default {
   state: readonly(state),
   updateCues,
   updateCurrentCue,
-  updateCurrentTimeEvent
+  updateCurrentTimeEvent,
+  toggleEditMode
 };

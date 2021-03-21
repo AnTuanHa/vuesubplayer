@@ -6,4 +6,5 @@ export default interface Store {
   updateCues(cues: VTTCue[]): void;
   updateCurrentCue(cue: VTTCue): void;
   updateCurrentTimeEvent(time: number, origin: Origin): void;
+  toggleEditMode(): void;
 }
