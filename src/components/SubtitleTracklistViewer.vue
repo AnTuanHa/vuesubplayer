@@ -69,6 +69,10 @@ export default defineComponent({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+p {
+  font-size: 18px;
+}
+
 .subtitle-tracklist-viewer {
   max-height: 100%;
   overflow-x: hidden;

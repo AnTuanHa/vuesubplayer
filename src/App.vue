@@ -1,12 +1,32 @@
 <template>
   <div id="app" @drop.prevent.stop="onDropEvent" @dragover.prevent.stop>
-    <main class="app-main">
-      <VideoPlayer :video-url="videoUrl" :subtitles-url="subtitlesUrl" />
+    <div
+      v-show="!videoUrl && !subtitlesUrl"
+      class="video-subtitles-missing hint"
+    >
+      Drag and drop a video file supported by your browser and subtitles file
+      (.srt, .ass) on this page
+    </div>
+    <div v-show="!videoUrl && subtitlesUrl" class="video-missing hint">
+      Drag and drop a video file supported by your browser on this page
+    </div>
+    <div v-show="videoUrl && !subtitlesUrl" class="subtitles-missing hint">
+      Drag and drop a subtitles file (.srt, .ass) on this page
+    </div>
+    <div v-show="loadVideoError" class="video-load-error hint">
+      {{ loadVideoError }}
+    </div>
+    <div v-show="videoUrl && !loadVideoError" class="app-main">
+      <VideoPlayer
+        :video-url="videoUrl"
+        :subtitles-url="subtitlesUrl"
+        @on-video-error="onVideoError"
+      />
       <SubtitleViewer />
-    </main>
-    <aside class="app-aside">
+    </div>
+    <div v-show="subtitlesUrl" class="app-aside">
       <SubtitleTracklistViewer />
-    </aside>
+    </div>
   </div>
 </template>
 
@@ -38,6 +58,7 @@ export default defineComponent({
 
     const subtitlesUrl = ref("");
     const videoUrl = ref("");
+    const loadVideoError = ref("");
 
     const loadSubtitleFile = (file: File) => {
       const reader = new FileReader();
@@ -59,11 +80,13 @@ export default defineComponent({
         URL.revokeObjectURL(videoUrl.value);
       }
       videoUrl.value = URL.createObjectURL(file);
+      loadVideoError.value = "";
     };
 
     return {
       subtitlesUrl,
       videoUrl,
+      loadVideoError,
       onDropEvent: (e: DragEvent) => {
         if (!e.dataTransfer) {
           return;
@@ -71,6 +94,9 @@ export default defineComponent({
         [...e.dataTransfer.files].forEach(file => {
           isSubtitleFile(file) ? loadSubtitleFile(file) : loadVideoFile(file);
         });
+      },
+      onVideoError: (message: string) => {
+        loadVideoError.value = message;
       }
     };
   }
@@ -91,21 +117,55 @@ body {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  display: flex;
-  flex-flow: row nowrap;
+  display: grid;
+  grid-template-areas:
+    "video video subtitles"
+    "video video subtitles"
+    "video video subtitles"
+    "video video subtitles";
+  grid-template-rows: auto auto auto;
+  grid-template-columns: auto auto 13vw;
   position: relative;
   background-color: black;
 }
 
 .app-main {
-  flex: 1 80vw;
+  grid-area: video;
   position: relative;
 }
 
 .app-aside {
-  flex: 1 0.001%;
+  grid-area: subtitles;
   height: 100vh;
   overflow: hidden;
   position: relative;
+}
+
+.video-subtitles-missing {
+  grid-area: video;
+}
+
+.video-missing {
+  grid-area: video;
+}
+
+.subtitles-missing {
+  grid-area: subtitles;
+}
+
+.video-load-error {
+  grid-area: video;
+}
+
+.hint {
+  color: white;
+  font-size: 24px;
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
 }
 </style>

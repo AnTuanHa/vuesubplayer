@@ -3,12 +3,13 @@
     <video
       ref="videoElement"
       class="video-element"
-      :src="videoUrl"
+      :src="videoUrl ? videoUrl : null"
       crossorigin="anonymous"
       controls
       disablePictureInPicture
       disabled
       tabIndex="-1"
+      @error="onVideoError"
       @timeupdate="onTimeUpdate"
     >
       <track
@@ -42,7 +43,7 @@ export default defineComponent({
     }
   },
 
-  setup() {
+  setup(_, { emit }) {
     const store = inject(StoreKey);
     if (!store) {
       throw new Error(`Could not resolve ${StoreKey.description}`);
@@ -86,6 +87,16 @@ export default defineComponent({
         store.updateCues(trackCues as VTTCue[]);
       },
 
+      onVideoError: () => {
+        if (!videoElement.value || !videoElement.value.error) {
+          return;
+        }
+        emit(
+          "onVideoError",
+          `Error code ${videoElement.value.error.code}. ${videoElement.value.error.message}`
+        );
+      },
+
       onTimeUpdate: () => {
         if (!videoElement.value) {
           return;
@@ -104,10 +115,7 @@ export default defineComponent({
 <style scoped>
 .video-player {
   height: 100vh;
-  display: flex;
   position: relative;
-  flex-direction: column;
-  justify-content: flex-end;
   align-items: center;
 }
 
