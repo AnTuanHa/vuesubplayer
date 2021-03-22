@@ -1,11 +1,39 @@
 <template>
-  <div ref="htmlElement" class="subtitle-element">
+  <div
+    ref="htmlElement"
+    class="subtitle-element"
+    :class="{ active: isActive(cue) }"
+    @click="onClick(cue)"
+  >
     <div
       class="subtitle"
-      :class="{ active: isActive(cue) }"
-      @click="onClick(cue)"
+      :class="{ editable: store.state.isInEditMode }"
+      :contenteditable="store.state.isInEditMode"
+      @input="updateCueText"
     >
-      <p>{{ cue.text }}</p>
+      {{ cue.text }}
+    </div>
+    <div v-show="store.state.isInEditMode" class="start-time">
+      <div class="start-time-label">Start Time</div>
+      <input
+        title="Starting time for the subtitle"
+        :value="cue.startTime"
+        class="start-time-input"
+        type="number"
+        step="0.1"
+        @input="updateStartTime($event.target.value)"
+      />
+    </div>
+    <div v-show="store.state.isInEditMode" class="end-time">
+      <div class="end-time-label">End Time</div>
+      <input
+        title="Ending time for the subtitle"
+        :value="cue.endTime"
+        class="end-time-input"
+        type="number"
+        step="0.1"
+        @input="updateEndTime($event.target.value)"
+      />
     </div>
   </div>
 </template>
@@ -52,6 +80,10 @@ export default defineComponent({
       store,
       htmlElement,
       onClick: function(cue: VTTCue) {
+        if (store.state.isInEditMode) {
+          return;
+        }
+
         // Add a small delta so that the tracklist selects the correct caption
         // if the user clicks on a subtitle that is timed too close to another one
         store.updateCurrentTimeEvent(
@@ -61,6 +93,28 @@ export default defineComponent({
       },
       isActive: function(cue: VTTCue): boolean {
         return store.state.currentCue.id === cue.id;
+      },
+      updateCueText: function(event: InputEvent) {
+        const cue = store.state.cues.find(cue => cue.id === props.cue.id);
+        if (!cue) {
+          return;
+        }
+        const element = event.target as HTMLElement;
+        cue.text = element.innerText;
+      },
+      updateStartTime: function(time: number) {
+        const cue = store.state.cues.find(cue => cue.id === props.cue.id);
+        if (!cue) {
+          return;
+        }
+        cue.startTime = time;
+      },
+      updateEndTime: function(time: number) {
+        const cue = store.state.cues.find(cue => cue.id === props.cue.id);
+        if (!cue) {
+          return;
+        }
+        cue.endTime = time;
       }
     };
   }
@@ -69,24 +123,61 @@ export default defineComponent({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-p {
-  font-size: 18px;
+input {
+  background-color: black;
+  color: #444444;
 }
 
-.subtitle {
-  font-size: 0.9em;
+.subtitle-element {
   cursor: pointer;
   margin: 0;
   padding: 1em;
+  display: grid;
+  grid-template-areas:
+    "text text"
+    "startTimeLabel endTimeLabel"
+    "startTimeLabel endTimeInput";
+  grid-template-rows: auto auto auto;
+  grid-template-columns: auto auto;
 }
 
-.subtitle:hover {
+.subtitle {
+  font-size: 1vw;
+  grid-area: text;
+}
+
+.subtitle-element:hover,
+.subtitle-element:hover input {
   background-color: #102027;
   color: white;
 }
 
-.active {
+.active,
+.active input {
   background-color: #37474f;
-  color: #ffffff;
+  color: white;
+}
+
+.editable {
+  border: 2px solid;
+  border-radius: 5px;
+}
+
+.start-time-label {
+  grid-area: startTimeLabel;
+}
+
+.start-time-input {
+  grid-area: startTimeInput;
+  width: 100%;
+}
+
+.end-time-label {
+  grid-area: endTimeLabel;
+}
+
+.end-time-input {
+  grid-area: endTimeInput;
+  width: 100%;
 }
 </style>

@@ -32,7 +32,7 @@
         class="edit-subtitles-button unselectable"
         @click="Store.toggleEditMode()"
       >
-        {{ Store.state.isInEditMode ? "Cancel" : "Edit Subtitles" }}
+        {{ Store.state.isInEditMode ? "Quit" : "Edit Subtitles" }}
       </div>
     </div>
   </div>
