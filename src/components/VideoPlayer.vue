@@ -56,10 +56,38 @@ export default defineComponent({
         if (!videoElement.value) {
           return;
         }
-        if (newTimeEvent.origin === Origin.SubtitleTracklistViewer) {
-          videoElement.value.currentTime = newTimeEvent.time;
-          videoElement.value.play();
+        if (newTimeEvent.origin === Origin.VideoPlayer) {
+          return;
         }
+        videoElement.value.currentTime = newTimeEvent.time;
+        videoElement.value.play();
+      }
+    );
+
+    // Update videoElement's text track cues with our internal cues list when it has been changed
+    watch(
+      () => store.state.cuesHasBeenChanged,
+      cuesHasBeenChanged => {
+        if (
+          !cuesHasBeenChanged ||
+          !videoElement.value ||
+          videoElement.value.textTracks.length < 1
+        ) {
+          return;
+        }
+        const firstTextTrack = videoElement.value.textTracks[0];
+        if (!firstTextTrack.cues) {
+          return;
+        }
+        for (const trackCue of firstTextTrack.cues) {
+          const cue = store.state.cues.find(cue => cue.id === trackCue.id);
+          if (!cue) {
+            continue;
+          }
+          trackCue.startTime = cue.startTime;
+          trackCue.endTime = cue.endTime;
+        }
+        store.setCuesHasBeenChanged(false);
       }
     );
 
@@ -73,7 +101,11 @@ export default defineComponent({
         if (!element.track.activeCues || !element.track.activeCues[0]) {
           return;
         }
-        store.updateCurrentCue(element.track.activeCues[0] as VTTCue);
+        const firstActiveCue = element.track.activeCues[0];
+        if (!firstActiveCue) {
+          return;
+        }
+        store.setCurrentCue(firstActiveCue.id);
       },
 
       onCaptionsLoad: (e: Event) => {
@@ -84,7 +116,7 @@ export default defineComponent({
           return;
         }
         const trackCues = [...element.track.cues];
-        store.updateCues(trackCues as VTTCue[]);
+        store.setCuesList(trackCues as VTTCue[]);
       },
 
       onVideoError: () => {

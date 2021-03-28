@@ -4,4 +4,5 @@ export default interface Caption {
   endTime: number;
   text: string;
   voice: string;
+  oldOffset: number;
 }

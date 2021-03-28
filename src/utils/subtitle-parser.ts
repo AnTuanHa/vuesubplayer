@@ -49,7 +49,8 @@ const convertAssToCaptions = (text: string) => {
         startTime: getSeconds(match[1]),
         endTime: getSeconds(match[2]),
         text: match[5].replace(reStyle, "").replace(/\\N/g, "\n"),
-        voice: match[3] && match[4] ? match[3] + " " + match[4] : ""
+        voice: match[3] && match[4] ? match[3] + " " + match[4] : "",
+        oldOffset: 0
       });
     }
   });
@@ -58,6 +59,8 @@ const convertAssToCaptions = (text: string) => {
 };
 
 const convertSrtToCaptions = (text: string) => {
+  text = text.replace(/\r/g, "");
+
   // HH:MM:SS,MMM
   // Hours:Minutes:Seconds,Milliseconds
   const reTime = /(\d\d):(\d\d):(\d\d),(\d\d\d)/;
@@ -82,7 +85,7 @@ const convertSrtToCaptions = (text: string) => {
   };
 
   const captions: Caption[] = [];
-  const entries = text.split(/\n[\r\n]+/g);
+  const entries = text.split(/\n[\n]+(?=[0-9]+\n)/g);
   entries.forEach(entry => {
     const lines = entry.split(/\n+/g);
     /* Proper SRT files have entries that look like:
@@ -107,7 +110,8 @@ const convertSrtToCaptions = (text: string) => {
           .slice(2)
           .join("\n")
           .replace(/\{\\an[0-9]{1,2}\}/g, ""),
-        voice: ""
+        voice: "",
+        oldOffset: 0
       });
     }
   });

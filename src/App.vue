@@ -34,6 +34,16 @@
       >
         {{ Store.state.isInEditMode ? "Quit" : "Edit Subtitles" }}
       </div>
+      <input
+        v-show="Store.state.isInEditMode"
+        ref="offsetInputElement"
+        title="Offset all subtitles by the specified value"
+        class="offset-input"
+        placeholder="Offset all subtitles"
+        type="number"
+        step="0.1"
+        @input="Store.offsetAllSubtitles($event.target.value)"
+      />
     </div>
   </div>
 </template>
@@ -63,6 +73,7 @@ export default defineComponent({
 
   setup() {
     provide(StoreKey, Store);
+    const offsetInputElement = ref<HTMLInputElement>();
 
     const subtitlesUrl = ref("");
     const videoUrl = ref("");
@@ -79,8 +90,12 @@ export default defineComponent({
         subtitlesUrl.value = `data:text/vtt;charset=utf-8,${encodeURIComponent(
           vtt
         )}`;
+
+        if (!offsetInputElement.value) {
+          return;
+        }
+        offsetInputElement.value.value = offsetInputElement.value.defaultValue;
       };
-      return;
     };
 
     const loadVideoFile = (file: File) => {
@@ -93,6 +108,7 @@ export default defineComponent({
 
     return {
       Store,
+      offsetInputElement,
       subtitlesUrl,
       videoUrl,
       loadVideoError,
@@ -152,6 +168,10 @@ body {
   grid-area: controls;
   width: 100%;
   height: 100%;
+  display: grid;
+  grid-template-areas: "toggleEditButton offsetSubtitlesInput";
+  grid-template-rows: auto;
+  grid-template-columns: 1fr auto;
 }
 
 .video-subtitles-missing {
@@ -183,7 +203,7 @@ body {
 }
 
 .edit-subtitles-button {
-  padding: 0.2rem;
+  grid-area: toggleEditButton;
   font-size: 1.5vh;
   display: flex;
   justify-content: center;
@@ -192,7 +212,6 @@ body {
   cursor: pointer;
   background-color: black;
   color: #444444;
-  height: 100%;
 }
 
 .edit-subtitles-button:hover {
@@ -205,5 +224,10 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.offset-input {
+  grid-area: offsetSubtitlesInput;
+  width: 100%;
 }
 </style>

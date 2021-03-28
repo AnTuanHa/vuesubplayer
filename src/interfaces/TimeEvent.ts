@@ -1,6 +1,6 @@
 export enum Origin {
   VideoPlayer,
-  SubtitleTracklistViewer
+  SubtitleElement
 }
 
 export default interface TimeEvent {

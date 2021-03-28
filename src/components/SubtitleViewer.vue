@@ -8,6 +8,8 @@
 import { defineComponent, inject } from "vue";
 import { StoreKey } from "@/symbols";
 
+// todo: if line has \n newlines, should add more divs/p
+
 export default defineComponent({
   name: "SubtitleViewer",
   setup() {

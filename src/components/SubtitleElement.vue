@@ -39,16 +39,17 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, inject, watch } from "vue";
+import { ref, defineComponent, inject, watch, PropType } from "vue";
 import { StoreKey } from "@/symbols";
 import { Origin } from "@/interfaces/TimeEvent";
+import Caption from "@/interfaces/Caption";
 
 export default defineComponent({
   name: "SubtitleElement",
 
   props: {
     cue: {
-      type: VTTCue,
+      type: Object as PropType<Caption>,
       default: {}
     }
   },
@@ -79,7 +80,7 @@ export default defineComponent({
     return {
       store,
       htmlElement,
-      onClick: function(cue: VTTCue) {
+      onClick: function(cue: Caption) {
         if (store.state.isInEditMode) {
           return;
         }
@@ -88,33 +89,26 @@ export default defineComponent({
         // if the user clicks on a subtitle that is timed too close to another one
         store.updateCurrentTimeEvent(
           cue.startTime + 0.0001,
-          Origin.SubtitleTracklistViewer
+          Origin.SubtitleElement
         );
       },
-      isActive: function(cue: VTTCue): boolean {
+      isActive: function(cue: Caption): boolean {
         return store.state.currentCue.id === cue.id;
       },
       updateCueText: function(event: InputEvent) {
-        const cue = store.state.cues.find(cue => cue.id === props.cue.id);
-        if (!cue) {
+        const element = event.target as HTMLElement;
+        store.updateCueTextInCuesList(props.cue.id, element.innerText);
+
+        if (store.state.currentCue.id !== props.cue.id) {
           return;
         }
-        const element = event.target as HTMLElement;
-        cue.text = element.innerText;
+        store.setCurrentCue(props.cue.id);
       },
       updateStartTime: function(time: number) {
-        const cue = store.state.cues.find(cue => cue.id === props.cue.id);
-        if (!cue) {
-          return;
-        }
-        cue.startTime = time;
+        store.updateCueStartTimeInCuesList(props.cue.id, time);
       },
       updateEndTime: function(time: number) {
-        const cue = store.state.cues.find(cue => cue.id === props.cue.id);
-        if (!cue) {
-          return;
-        }
-        cue.endTime = time;
+        store.updateCueEndTimeInCuesList(props.cue.id, time);
       }
     };
   }

@@ -1,8 +1,10 @@
+import Caption from "./Caption";
 import TimeEvent from "./TimeEvent";
 
 export default interface State {
-  cues: VTTCue[];
-  currentCue: VTTCue;
+  cues: Caption[];
+  currentCue: Caption;
   currentTimeEvent: TimeEvent;
   isInEditMode: boolean;
+  cuesHasBeenChanged: boolean;
 }
