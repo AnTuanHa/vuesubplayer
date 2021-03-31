@@ -21,7 +21,7 @@
         class="start-time-input"
         type="number"
         step="0.1"
-        @input="updateStartTime($event.target.value)"
+        @input="updateStartTime($event)"
       />
     </div>
     <div v-show="store.state.isInEditMode" class="end-time">
@@ -32,7 +32,7 @@
         class="end-time-input"
         type="number"
         step="0.1"
-        @input="updateEndTime($event.target.value)"
+        @input="updateEndTime($event)"
       />
     </div>
   </div>
@@ -104,10 +104,14 @@ export default defineComponent({
         }
         store.setCurrentCue(props.cue.id);
       },
-      updateStartTime: function(time: number) {
+      updateStartTime: function(e: Event) {
+        const inputElement = e.target as HTMLInputElement;
+        const time = Number(inputElement.value);
         store.updateCueStartTimeInCuesList(props.cue.id, time);
       },
-      updateEndTime: function(time: number) {
+      updateEndTime: function(e: Event) {
+        const inputElement = e.target as HTMLInputElement;
+        const time = Number(inputElement.value);
         store.updateCueEndTimeInCuesList(props.cue.id, time);
       }
     };
