@@ -1,5 +1,20 @@
 import Caption from "@/interfaces/Caption";
 
+const padWithZeros = (num: number, digits: number) => {
+  return ("0000" + num).slice(-digits);
+};
+
+const formatTime = (seconds: number) => {
+  const date = new Date(2000, 0, 1, 0, 0, 0, Math.max(0, seconds) * 1000);
+  return [
+    padWithZeros(date.getHours(), 2),
+    padWithZeros(date.getMinutes(), 2),
+    padWithZeros(date.getSeconds(), 2) +
+      "," +
+      padWithZeros(date.getMilliseconds(), 3)
+  ].join(":");
+};
+
 const getSeconds = (timeStr: string, timeRegex: RegExp) => {
   const match = timeStr.match(timeRegex);
   if (!match) {
@@ -61,6 +76,29 @@ const convertSrtToCaptions = (text: string) => {
   return captions.length ? captions : null;
 };
 
+const convertCaptionsToSrt = (captions: readonly Caption[]) => {
+  if (!captions) {
+    return null;
+  }
+
+  const lines = captions.map((caption, index) => {
+    const line = [];
+    line.push(index + 1);
+    line.push(
+      `${formatTime(caption.startTime)} --> ${formatTime(caption.endTime)}`
+    );
+    if (caption.voice) {
+      line.push(`(${caption.voice})${caption.text}`);
+    } else {
+      line.push(caption.text);
+    }
+    return line.join("\n");
+  });
+
+  return lines.join("\n\n");
+};
+
 export default {
-  convertSrtToCaptions
+  convertSrtToCaptions,
+  convertCaptionsToSrt
 };

@@ -43,6 +43,14 @@
       >
         {{ Store.state.isInEditMode ? "Quit" : "Edit Subtitles" }}
       </div>
+      <a
+        v-show="!Store.state.isInEditMode"
+        class="download-subtitles-button unselectable"
+        :download="subtitleFileName"
+        :href="downloadSubtitlesLink"
+      >
+        Download Subtitles
+      </a>
       <input
         v-show="Store.state.isInEditMode"
         ref="offsetInputElement"
@@ -58,10 +66,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, provide, ref } from "vue";
+import { computed, defineComponent, provide, ref } from "vue";
 import { StoreKey } from "./symbols";
 import Store from "./Store";
 import SubtitleParser from "./utils/SubtitleParser";
+import SrtSubtitles from "./utils/SrtSubtitles";
 
 import SubtitleViewer from "./components/SubtitleViewer.vue";
 import SubtitleTracklistViewer from "./components/SubtitleTracklistViewer.vue";
@@ -84,6 +93,7 @@ export default defineComponent({
     provide(StoreKey, Store);
     const offsetInputElement = ref<HTMLInputElement>();
 
+    const subtitleFileName = ref("");
     const subtitlesUrl = ref("");
     const videoUrl = ref("");
     const loadVideoError = ref("");
@@ -95,12 +105,14 @@ export default defineComponent({
       reader.onload = () => {
         const vtt = SubtitleParser.convertFileToVtt(reader.result as string);
         if (!vtt) {
+          subtitleFileName.value = "";
           loadSubtitlesError.value = `Failed to parse subtitles (.ass or .srt): ${file.name}`;
           return;
         }
         subtitlesUrl.value = `data:text/vtt;charset=utf-8,${encodeURIComponent(
           vtt
         )}`;
+        subtitleFileName.value = file.name;
         loadSubtitlesError.value = "";
 
         if (!offsetInputElement.value) {
@@ -118,13 +130,25 @@ export default defineComponent({
       loadVideoError.value = "";
     };
 
+    const downloadSubtitlesLink = computed(() => {
+      const text = SrtSubtitles.convertCaptionsToSrt(Store.state.cues);
+      if (!text) {
+        return;
+      }
+      const fileType = "srt";
+      const blob = new Blob([text], { type: fileType });
+      return URL.createObjectURL(blob);
+    });
+
     return {
       Store,
       offsetInputElement,
+      subtitleFileName,
       subtitlesUrl,
       videoUrl,
       loadVideoError,
       loadSubtitlesError,
+      downloadSubtitlesLink,
       onDropEvent: (e: DragEvent) => {
         if (!e.dataTransfer) {
           return;
@@ -182,7 +206,7 @@ body {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-areas: "toggleEditButton offsetSubtitlesInput";
+  grid-template-areas: "item1 item2";
   grid-template-rows: auto;
   grid-template-columns: 1fr auto;
 }
@@ -221,7 +245,16 @@ body {
 }
 
 .edit-subtitles-button {
-  grid-area: toggleEditButton;
+  grid-area: item1;
+}
+
+.download-subtitles-button {
+  grid-area: item2;
+  text-decoration: none;
+}
+
+.edit-subtitles-button,
+.download-subtitles-button {
   font-size: 1.5vh;
   display: flex;
   justify-content: center;
@@ -230,9 +263,11 @@ body {
   cursor: pointer;
   background-color: black;
   color: #444444;
+  padding: 0.5vh;
 }
 
-.edit-subtitles-button:hover {
+.edit-subtitles-button:hover,
+.download-subtitles-button:hover {
   background-color: #102027;
   color: white;
 }
@@ -245,7 +280,7 @@ body {
 }
 
 .offset-input {
-  grid-area: offsetSubtitlesInput;
+  grid-area: item2;
   width: 100%;
 }
 </style>
