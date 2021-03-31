@@ -1,14 +1,17 @@
 <template>
   <div class="subtitle-viewer">
-    {{ store.state.currentCue.text }}
+    <div
+      v-for="(line, index) in store.state.currentCue.text.split('\n')"
+      :key="index"
+    >
+      {{ line }}
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, inject } from "vue";
 import { StoreKey } from "@/symbols";
-
-// todo: if line has \n newlines, should add more divs/p
 
 export default defineComponent({
   name: "SubtitleViewer",
