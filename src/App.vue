@@ -52,7 +52,7 @@
 import { defineComponent, provide, ref } from "vue";
 import { StoreKey } from "./symbols";
 import Store from "./Store";
-import SubtitleParser from "./utils/subtitle-parser";
+import SubtitleParser from "./utils/SubtitleParser";
 
 import SubtitleViewer from "./components/SubtitleViewer.vue";
 import SubtitleTracklistViewer from "./components/SubtitleTracklistViewer.vue";
@@ -83,7 +83,7 @@ export default defineComponent({
       const reader = new FileReader();
       reader.readAsText(file);
       reader.onload = () => {
-        const vtt = SubtitleParser.toVtt(reader.result as string);
+        const vtt = SubtitleParser.convertFileToVtt(reader.result as string);
         if (!vtt) {
           return;
         }
