@@ -7,14 +7,23 @@
       Drag and drop a video file supported by your browser and subtitles file
       (.srt, .ass) on this page
     </div>
-    <div v-show="!videoUrl && subtitlesUrl" class="video-missing hint">
+    <div
+      v-show="!videoUrl && subtitlesUrl && !loadVideoError"
+      class="video-missing hint"
+    >
       Drag and drop a video file supported by your browser on this page
     </div>
-    <div v-show="videoUrl && !subtitlesUrl" class="subtitles-missing hint">
+    <div
+      v-show="videoUrl && !subtitlesUrl && !loadSubtitlesError"
+      class="subtitles-missing hint"
+    >
       Drag and drop a subtitles file (.srt, .ass) on this page
     </div>
     <div v-show="loadVideoError" class="video-load-error hint">
       {{ loadVideoError }}
+    </div>
+    <div v-show="loadSubtitlesError" class="subtitles-load-error hint">
+      {{ loadSubtitlesError }}
     </div>
     <div v-show="videoUrl && !loadVideoError" class="app-main">
       <VideoPlayer
@@ -24,10 +33,10 @@
       />
       <SubtitleViewer />
     </div>
-    <div v-show="subtitlesUrl" class="app-aside">
+    <div v-show="subtitlesUrl && !loadSubtitlesError" class="app-aside">
       <SubtitleTracklistViewer />
     </div>
-    <div v-show="subtitlesUrl" class="controls">
+    <div v-show="subtitlesUrl && !loadSubtitlesError" class="controls">
       <div
         class="edit-subtitles-button unselectable"
         @click="Store.toggleEditMode()"
@@ -78,6 +87,7 @@ export default defineComponent({
     const subtitlesUrl = ref("");
     const videoUrl = ref("");
     const loadVideoError = ref("");
+    const loadSubtitlesError = ref("");
 
     const loadSubtitleFile = (file: File) => {
       const reader = new FileReader();
@@ -85,11 +95,13 @@ export default defineComponent({
       reader.onload = () => {
         const vtt = SubtitleParser.convertFileToVtt(reader.result as string);
         if (!vtt) {
+          loadSubtitlesError.value = `Failed to parse subtitles (.ass or .srt): ${file.name}`;
           return;
         }
         subtitlesUrl.value = `data:text/vtt;charset=utf-8,${encodeURIComponent(
           vtt
         )}`;
+        loadSubtitlesError.value = "";
 
         if (!offsetInputElement.value) {
           return;
@@ -112,6 +124,7 @@ export default defineComponent({
       subtitlesUrl,
       videoUrl,
       loadVideoError,
+      loadSubtitlesError,
       onDropEvent: (e: DragEvent) => {
         if (!e.dataTransfer) {
           return;
@@ -188,6 +201,11 @@ body {
 
 .video-load-error {
   grid-area: video;
+}
+
+.subtitles-load-error {
+  grid-area: subtitles;
+  word-wrap: break-word;
 }
 
 .hint {
