@@ -1,16 +1,13 @@
 <template>
   <div class="subtitle-viewer">
-    <div
-      v-for="(line, index) in store.state.currentCue.text.split('\n')"
-      :key="index"
-    >
+    <div v-for="(line, index) in text" :key="index">
       {{ line }}
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, inject } from "vue";
+import { computed, defineComponent, inject } from "vue";
 import { StoreKey } from "@/symbols";
 
 export default defineComponent({
@@ -20,8 +17,11 @@ export default defineComponent({
     if (!store) {
       throw new Error(`Could not resolve ${StoreKey.description}`);
     }
+
+    const text = computed(() => store.state.currentCue.text.split("\n"));
+
     return {
-      store
+      text
     };
   }
 });
