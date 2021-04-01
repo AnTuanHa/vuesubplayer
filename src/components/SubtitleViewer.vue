@@ -1,6 +1,6 @@
 <template>
   <div class="subtitle-viewer">
-    <div v-for="(line, index) in text" :key="index">
+    <div v-for="(line, index) in text" :key="index" data-test="line">
       {{ line }}
     </div>
   </div>
