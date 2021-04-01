@@ -1,12 +1,12 @@
 <template>
   <div class="subtitle-tracklist-viewer">
-    <SubtitleElement v-for="cue in store.state.cues" :key="cue.id" :cue="cue">
+    <SubtitleElement v-for="cue in cues" :key="cue.id" :cue="cue">
     </SubtitleElement>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, inject } from "vue";
+import { computed, defineComponent, inject } from "vue";
 import { StoreKey } from "@/symbols";
 
 import SubtitleElement from "./SubtitleElement.vue";
@@ -24,8 +24,9 @@ export default defineComponent({
       throw new Error(`Could not resolve ${StoreKey.description}`);
     }
 
+    const cues = computed(() => store.state.cues);
     return {
-      store
+      cues
     };
   }
 });
