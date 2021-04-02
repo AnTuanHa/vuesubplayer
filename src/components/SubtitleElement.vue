@@ -2,18 +2,18 @@
   <div
     ref="htmlElement"
     class="subtitle-element"
-    :class="{ active: isActive(cue) }"
-    @click="onClick(cue)"
+    :class="{ active: isActive }"
+    @click="onClick"
   >
     <div
       class="subtitle"
-      :class="{ editable: store.state.isInEditMode }"
-      :contenteditable="store.state.isInEditMode"
-      @input="updateCueText"
+      :class="{ editable: isInEditMode }"
+      :contenteditable="isInEditMode"
+      @input="updateCueText($event.target.innerText)"
     >
       {{ cue.text }}
     </div>
-    <div v-show="store.state.isInEditMode" class="start-time">
+    <div v-show="isInEditMode" class="start-time">
       <div class="start-time-label">Start Time</div>
       <input
         title="Starting time for the subtitle"
@@ -21,10 +21,10 @@
         class="start-time-input"
         type="number"
         step="0.1"
-        @input="updateStartTime($event)"
+        @input="updateStartTime(Number($event.target.value))"
       />
     </div>
-    <div v-show="store.state.isInEditMode" class="end-time">
+    <div v-show="isInEditMode" class="end-time">
       <div class="end-time-label">End Time</div>
       <input
         title="Ending time for the subtitle"
@@ -32,14 +32,14 @@
         class="end-time-input"
         type="number"
         step="0.1"
-        @input="updateEndTime($event)"
+        @input="updateEndTime(Number($event.target.value))"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, inject, watch, PropType } from "vue";
+import { computed, ref, defineComponent, inject, watch, PropType } from "vue";
 import { StoreKey } from "@/symbols";
 import { Origin } from "@/interfaces/TimeEvent";
 import Caption from "@/interfaces/Caption";
@@ -50,7 +50,7 @@ export default defineComponent({
   props: {
     cue: {
       type: Object as PropType<Caption>,
-      default: {}
+      required: true
     }
   },
 
@@ -60,6 +60,9 @@ export default defineComponent({
       throw new Error(`Could not resolve ${StoreKey.description}`);
     }
     const htmlElement = ref<HTMLElement>();
+
+    const isInEditMode = computed(() => store.state.isInEditMode);
+    const isActive = computed(() => store.state.currentCue.id === props.cue.id);
 
     watch(
       () => store.state.currentCue,
@@ -78,40 +81,33 @@ export default defineComponent({
     );
 
     return {
-      store,
       htmlElement,
-      onClick: function(cue: Caption) {
-        if (store.state.isInEditMode) {
+      isInEditMode,
+      isActive,
+      onClick: () => {
+        if (isInEditMode.value) {
           return;
         }
 
         // Add a small delta so that the tracklist selects the correct caption
         // if the user clicks on a subtitle that is timed too close to another one
         store.updateCurrentTimeEvent(
-          cue.startTime + 0.0001,
+          props.cue.startTime + 0.0001,
           Origin.SubtitleElement
         );
       },
-      isActive: function(cue: Caption): boolean {
-        return store.state.currentCue.id === cue.id;
-      },
-      updateCueText: function(event: InputEvent) {
-        const element = event.target as HTMLElement;
-        store.updateCueTextInCuesList(props.cue.id, element.innerText);
+      updateCueText: (text: string) => {
+        store.updateCueTextInCuesList(props.cue.id, text);
 
         if (store.state.currentCue.id !== props.cue.id) {
           return;
         }
         store.setCurrentCue(props.cue.id);
       },
-      updateStartTime: function(e: Event) {
-        const inputElement = e.target as HTMLInputElement;
-        const time = Number(inputElement.value);
+      updateStartTime: (time: number) => {
         store.updateCueStartTimeInCuesList(props.cue.id, time);
       },
-      updateEndTime: function(e: Event) {
-        const inputElement = e.target as HTMLInputElement;
-        const time = Number(inputElement.value);
+      updateEndTime: (time: number) => {
         store.updateCueEndTimeInCuesList(props.cue.id, time);
       }
     };
