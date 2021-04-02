@@ -9,29 +9,32 @@
       class="subtitle"
       :class="{ editable: isInEditMode }"
       :contenteditable="isInEditMode"
+      data-test="subtitleTextBox"
       @input="updateCueText($event.target.innerText)"
     >
       {{ cue.text }}
     </div>
     <div v-show="isInEditMode" class="start-time">
-      <div class="start-time-label">Start Time</div>
+      <div class="start-time-label" data-test="startTimeLabel">Start Time</div>
       <input
         title="Starting time for the subtitle"
         :value="cue.startTime"
         class="start-time-input"
         type="number"
         step="0.1"
+        data-test="startTimeInputBox"
         @input="updateStartTime(Number($event.target.value))"
       />
     </div>
     <div v-show="isInEditMode" class="end-time">
-      <div class="end-time-label">End Time</div>
+      <div class="end-time-label" data-test="endTimeLabel">End Time</div>
       <input
         title="Ending time for the subtitle"
         :value="cue.endTime"
         class="end-time-input"
         type="number"
         step="0.1"
+        data-test="endTimeInputBox"
         @input="updateEndTime(Number($event.target.value))"
       />
     </div>
