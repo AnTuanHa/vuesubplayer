@@ -1,6 +1,11 @@
 <template>
   <div class="subtitle-tracklist-viewer">
-    <SubtitleElement v-for="cue in cues" :key="cue.id" :cue="cue">
+    <SubtitleElement
+      v-for="cue in cues"
+      :key="cue.id"
+      :cue="cue"
+      data-test="subtitle"
+    >
     </SubtitleElement>
   </div>
 </template>
