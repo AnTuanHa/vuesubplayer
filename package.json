@@ -10,7 +10,11 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@types/sinon": "^9.0.11",
+    "@types/sinon-chai": "^3.2.5",
     "core-js": "^3.6.5",
+    "sinon": "^10.0.0",
+    "sinon-chai": "^3.6.0",
     "vue": "^3.0.0"
   },
   "devDependencies": {
