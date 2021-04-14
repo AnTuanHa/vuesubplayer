@@ -1,6 +1,7 @@
 <template>
   <div class="video-player">
     <video
+      v-show="videoUrl"
       ref="videoElement"
       class="video-element"
       :src="videoUrl ? videoUrl : null"
