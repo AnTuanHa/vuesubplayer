@@ -9,11 +9,28 @@
 // /* eslint-disable import/no-extraneous-dependencies, global-require */
 // const webpack = require('@cypress/webpack-preprocessor')
 
+const { rmdir } = require("fs");
+
 module.exports = (on, config) => {
   // on('file:preprocessor', webpack({
   //  webpackOptions: require('@vue/cli-service/webpack.config'),
   //  watchOptions: {}
   // }))
+
+  on("task", {
+    deleteFolder(folderName) {
+      console.log(`Deleting folder: ${folderName}`);
+      return new Promise((resolve, reject) => {
+        rmdir(folderName, { maxRetries: 10, recursive: true }, err => {
+          if (err) {
+            console.error(err);
+            return reject(err);
+          }
+          resolve(null);
+        });
+      });
+    }
+  });
 
   return Object.assign({}, config, {
     fixturesFolder: "tests/e2e/fixtures",
