@@ -1,0 +1,15 @@
+1
+00:00:01,580 --> 00:00:05,340
+Hello, this is a video for testing the project.
+
+2
+00:00:09,270 --> 00:00:11,460
+Here, I will be drawing an image.
+
+3
+00:00:15,260 --> 00:00:17,790
+This is an image of a smiley face.
+
+4
+00:00:18,110 --> 00:00:19,890
+Thank you for watching.
